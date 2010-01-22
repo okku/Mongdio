@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mongdio", "Mongdio\Mongdio.csproj", "{0698D4B0-8004-4258-9178-F1B8BD1326DC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MongoDB.Driver", "..\..\..\libs\mongodb-csharp\MongoDBDriver\MongoDB.Driver.csproj", "{B125BBA6-BFFD-44FA-9254-9B1754CD8AF3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MongoDB.Driver", "..\..\lib\mongodb-csharp\MongoDBDriver\MongoDB.Driver.csproj", "{B125BBA6-BFFD-44FA-9254-9B1754CD8AF3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MongdioLogic", "MongdioLogic\MongdioLogic.csproj", "{4E116520-425A-4849-8A8B-F9E7D095C753}"
 EndProject

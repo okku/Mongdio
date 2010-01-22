@@ -25,12 +25,24 @@ namespace Mongdio
 
 		void MongoEditorControl_KeyDown(object sender, KeyEventArgs e)
 		{
-			if(e.Alt && e.KeyCode == Keys.X)
+			if(e.KeyCode == Keys.F5)
 			{
 				//MessageBox.Show(this, rtEditor.SelectedText);
-				var result = _session.Execute(rtEditor.SelectedText);
-				rtResult.AppendText(result);
+				string command;
+				if(rtEditor.SelectedText.Length > 0)
+					command = rtEditor.SelectedText;
+				else
+					command = rtEditor.Text;
+
+				RunCommand(command);
 			}
+		}
+
+		private void RunCommand(string command)
+		{
+			rtResult.Clear();
+			var result = _session.Execute(command);
+			rtResult.AppendText(result);
 		}
 	}
 }
