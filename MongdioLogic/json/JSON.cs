@@ -128,9 +128,10 @@ namespace Procurios.Public
 			bool done = false;
 			while (!done) {
 				token = LookAhead(json, index);
-				if (token == JSON.TOKEN_NONE) {
-					return null;
-				} else if (token == JSON.TOKEN_COMMA) {
+//				if (token == JSON.TOKEN_NONE) {
+//					return null;
+//				} else 
+				if (token == JSON.TOKEN_COMMA) {
 					NextToken(json, ref index);
 				} else if (token == JSON.TOKEN_CURLY_CLOSE) {
 					NextToken(json, ref index);
@@ -138,7 +139,7 @@ namespace Procurios.Public
 				} else {
 
 					// name
-					string name = ParseString(json, ref index);
+					string name = ParseString(json, ref index, true);
 					if (name == null) {
 						return null;
 					}
@@ -198,7 +199,7 @@ namespace Procurios.Public
 		{
 			switch (LookAhead(json, index)) {
 				case JSON.TOKEN_STRING:
-					return ParseString(json, ref index);
+					return ParseString(json, ref index, false);
 				case JSON.TOKEN_NUMBER:
 					return ParseNumber(json, ref index);
 				case JSON.TOKEN_CURLY_OPEN:
@@ -222,7 +223,7 @@ namespace Procurios.Public
 			return null;
 		}
 
-		protected string ParseString(char[] json, ref int index)
+		protected string ParseString(char[] json, ref int index, bool allowNonQutedString)
 		{
 			string s = "";
 			char c;
@@ -231,6 +232,8 @@ namespace Procurios.Public
 			
 			// "
 			c = json[index++];
+			if(allowNonQutedString && c != '"')
+				index--;
 
 			bool complete = false;
 			while (!complete) {
@@ -240,7 +243,10 @@ namespace Procurios.Public
 				}
 
 				c = json[index++];
-				if (c == '"') {
+				if(c == '"' || (allowNonQutedString && (c == ':' || c == ' ') ))
+				{
+					if(c == ':')
+						index--;
 					complete = true;
 					break;
 				} else if (c == '\\') {

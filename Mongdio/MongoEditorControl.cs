@@ -6,7 +6,9 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Mongdio.code;
 using MongdioLogic;
+using MongdioLogic.db;
 
 namespace Mongdio
 {
@@ -14,13 +16,13 @@ namespace Mongdio
 	{
 		private MongoEditorSession _session;
 
-		public MongoEditorControl()
+		public MongoEditorControl(string name)
 		{
 			InitializeComponent();
 			KeyDown += MongoEditorControl_KeyDown;
 			rtEditor.KeyDown += MongoEditorControl_KeyDown;
 
-			_session = new MongoEditorSession();
+			_session = new MongoEditorSession(name);
 		}
 
 		void MongoEditorControl_KeyDown(object sender, KeyEventArgs e)
@@ -40,9 +42,20 @@ namespace Mongdio
 
 		private void RunCommand(string command)
 		{
-			rtResult.Clear();
-			var result = _session.Execute(command);
-			rtResult.AppendText(result);
+			int objectCount;
+			if(!toolStripColoring.Checked)
+			{
+				var printer = new PrettyPrint();
+				var result = _session.Execute(command,out objectCount,printer);
+				rtResult.Text = result;
+			}
+			else
+			{
+				var printer = new RTFPrettyPrinter();
+				var rtfResult = _session.Execute(command, out objectCount, printer);
+				RTFHelper.SetRTF(rtResult, rtfResult, RTFHelper.COLOR_TABLE);
+			}
+			toolStripCommandLabel.Text = string.Format("{0} objects", objectCount);
 		}
 	}
 }

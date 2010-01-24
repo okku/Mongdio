@@ -9,14 +9,14 @@ namespace MongdioLogic.db
 	public class Mong : Mongo, IDisposable
 	{
 		public const string DBN = "cl";
-		public const string DB_USERS = "users";
-		public const string DB_ARTISTS = "artists";
-		public const string DB_ALBUMS = "albums";
-		public const string DB_SONGS = "songs";
-		public const string DB_PLAYLISTS = "pls";
-		public const string DB_STREAMEVENTS = "strevs";
-		public const string DB_PLAYEVENTS = "plevs";
-		public const string DB_TAGARTISTS = "tagarts";
+
+		public Mong()
+		{
+		}
+
+		public Mong(string host, int port) : base(host, port)
+		{
+		}
 
 		public void Dispose()
 		{
@@ -50,47 +50,6 @@ namespace MongdioLogic.db
 			var retVal = this[DBN].SendCommand(doc);
 			return retVal["retval"];
 		}
-
-		public IMongoCollection Users
-		{
-			get { return this[DBN][DB_USERS]; }
-		}
-		
-		public IMongoCollection Artists
-		{
-			get { return this[DBN][DB_ARTISTS]; }
-		}
-
-		public IMongoCollection Albums
-		{
-			get { return this[DBN][DB_ALBUMS]; }
-		}
-
-		public IMongoCollection Songs
-		{
-			get { return this[DBN][DB_SONGS]; }
-		}
-
-		public IMongoCollection Playlists
-		{
-			get { return this[DBN][DB_PLAYLISTS]; }
-		}
-
-		public IMongoCollection StreamEvents
-		{
-			get { return this[DBN][DB_STREAMEVENTS]; }
-		}
-
-		public IMongoCollection PlayEvents
-		{
-			get { return this[DBN][DB_PLAYEVENTS]; }
-		}
-
-		public IMongoCollection TagArtists
-		{
-			get { return this[DBN][DB_TAGARTISTS]; }
-		}
-	
 		
 	}
 }

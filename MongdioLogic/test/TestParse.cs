@@ -17,6 +17,7 @@ namespace MongdioLogic.test
 			//var d = DocumentExtensions.Parse("[1,2,3]");
 			//var d = DocumentExtensions.Parse("{\"top\":1}");
 			var d = DocumentExtensions.Parse("{\"objects\":[1,{\"top\":1},3]}");
+			string t = d.ToString();
 			Assert.That(d, Is.Not.Null);
 			Assert.That(d["objects"], Is.Not.Null);
 		}

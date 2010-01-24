@@ -149,9 +149,20 @@ namespace MongdioLogic.db
 			return d;
 		}
 
+		public static List<object> ParseArray(string array)
+		{
+			var arr = JSON.JsonDecode(array);
+			if(arr==null && arr is ArrayList)
+				throw new ArgumentException("Unparsable arguments: " + array);
+			var list = new List<object>();
+			return (arr as ArrayList).OfType<object>().Select(x=>ConvertTo(x)).ToList();
+		}
+
 		public static Document Parse(string text)
 		{
 			var decoded = JSON.JsonDecode(text);
+			if(text.Trim().Length > 0 && decoded == null)
+				throw new Exception("Document unparsable '" + text + "'");
 			var bson = ConvertTo(decoded);
 			return bson as Document;
 		}
@@ -160,16 +171,13 @@ namespace MongdioLogic.db
 		{
 			if(v is ArrayList)
 			{
-				var newArr = new ArrayList();
+				var newArr = new List<object>();
 				var val = v as ArrayList;
 				foreach(var o in val)
 				{
-					if(o is Hashtable || o is ArrayList)
-						newArr.Add(ConvertTo(o));
-					else
-						newArr.Add(o);
+					newArr.Add(ConvertTo(o));
 				}
-				return newArr;
+				return newArr.ToArray();
 			}
 			else if(v is Hashtable)
 			{
@@ -181,8 +189,24 @@ namespace MongdioLogic.db
 				}
 				return d;
 			}
+			else if(v is string)
+			{
+				string s = v.ToString();
+				if(s.StartsWith("/") && (s.EndsWith("/") || s.EndsWith("/i") || s.EndsWith("/m")))
+				{
+					MongoRegex mr;
+					if(s.EndsWith("/i") || s.EndsWith("/m"))
+						mr = new MongoRegex(s.Substring(1,s.Length-3),s.Substring(s.Length-2,1));
+					else
+						mr = new MongoRegex(s.Substring(1, s.Length - 3));
+					return mr;
+				}
+				else
+					return v;
+			}
 			else
 				return v;
 		}
+
 	}
 }
