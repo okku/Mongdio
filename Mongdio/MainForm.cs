@@ -59,5 +59,11 @@ namespace Mongdio
 			root.Expand();
 			treeViewMenu.EndUpdate();
 		}
+
+		private void howToToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			AboutBox ab = new AboutBox();
+			ab.Show();
+		}
 	}
 }
