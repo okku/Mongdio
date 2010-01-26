@@ -6,12 +6,13 @@ using System.Text;
 using System.Text.RegularExpressions;
 using MongdioLogic.db;
 using MongoDB.Driver;
-using Procurios.Public;
 
 namespace MongdioLogic
 {
 	public class MongoEditorSession
 	{
+		private string _lastCollectionUsed;
+
 		public string DataBaseName { get; set; }
 		public MongoEditorSession(string dbname)
 		{
@@ -23,6 +24,7 @@ namespace MongdioLogic
 			objectCount = 0; 
 			try
 			{
+				_lastCollectionUsed = null;
 				string collectionName, operation;
 				string innerCommand = ParseCollectionAndOperation(command, out collectionName, out operation);
 				Document doc;
@@ -34,6 +36,7 @@ namespace MongdioLogic
 						{
 							var l = db[DataBaseName][collectionName].Find(doc);
 							objectCount = l.Documents.Count();
+							_lastCollectionUsed = collectionName;
 							return printer.Print(l.Documents);
 						}
 						break;
@@ -43,6 +46,7 @@ namespace MongdioLogic
 						{
 							var l = db[DataBaseName][collectionName].FindOne(doc);
 							objectCount = 1;
+							_lastCollectionUsed = collectionName;
 							return printer.Print(l);
 						}
 						break;
@@ -52,7 +56,7 @@ namespace MongdioLogic
 						{
 							objectCount = 0;
 							if(args.Count == 1 && args[0] is Document)
-								db[DataBaseName][collectionName].Update(args[0] as Document);
+								UpdateObjectAlwaysUpsert(collectionName, args[0] as Document, db);
 							else if(args.Count == 2 && args[0] is Document && args[1] is Document)
 								db[DataBaseName][collectionName].Update(args[1] as Document, args[0] as Document);
 							else if(args.Count == 3 && args[0] is Document && args[1] is Document && (args[2] is double || args[2] is bool))
@@ -78,12 +82,37 @@ namespace MongdioLogic
 							return "Sent update command";
 						}
 						break;
+					case "eval":
+						string function;
+						List<object> oargs;
+						if(!SplitIntoFunctionAndArguments(innerCommand, out function, out oargs))
+							return "Parse error";
+						using(var db = MDB.GetMongo())
+						{
+							if(oargs!=null && oargs.Count>0)
+								doc = DocumentExtensions.Eval(function, oargs.ToArray());
+							else
+								doc = DocumentExtensions.Eval(function);
+							var retVal = db[DataBaseName].SendCommand(doc);
+							return printer.Print(retVal);
+						}
+						break;
+					case "count":
+						doc = DocumentExtensions.Parse(innerCommand);
+						using(var db = MDB.GetMongo())
+						{
+							long count;
+							if(doc != null)
+								count = db[DataBaseName][collectionName].Count(doc);
+							else
+								count = db[DataBaseName][collectionName].Count();
+							return "Count " + count;
+						}
+						break;
 					default:
 						return "Unknown operation '" + operation + "'";
 						break;
 				}
-				//var doc = db["cl"].SendCommand(command);
-				//return doc.ToString();
 			}
 			catch(MongoCommandException e)
 			{
@@ -93,28 +122,64 @@ namespace MongdioLogic
 			{
 				return e.Message;
 			}
-			/*			if(command.StartsWith("find"))
-						{
-							var doc = GetQueryCommand(command);
-							using(var db = MDB.GetMongo())
-							{
-								try
-								{
-									db["cl"]["pls"].Find(doc);
-									return doc.ToString();
-								}
-								catch(MongoCommandException e)
-								{
-									return e.Error.ToString();
-								}
-							}
+		}
 
-						}
-						using(var db = MDB.GetMongo())
-						{
+		//If _id exists but has changed save new object
+		private void UpdateObjectAlwaysUpsert(string collectionName, Document doc, Mong db)
+		{
+            if(doc.Contains("_id") && doc["_id"] != null)
+            {
+            	var selector = new Document();
+				selector["_id"] = doc["_id"];
+				db[DataBaseName][collectionName].Update(doc,selector,1);
+            }   
+			else
+				db[DataBaseName][collectionName].Update(doc);
 
-						}*/
-			return "";
+			db[DataBaseName][collectionName].Update(doc);
+		}
+
+		private bool SplitIntoFunctionAndArguments(string command, out string function, out List<object> args)
+		{
+			function = null;
+			args = null;
+
+			var p0 = command.IndexOf("function");
+			if(p0 < 0)
+				return false;
+
+			int x = 0;
+			bool ff = false;
+			for(int i = p0; i < command.Length; i++)
+			{
+				var c = command[i];
+				if(c == '{')
+				{
+					x++;
+					ff = true;
+				}
+				else if(c == '}')
+					x--;
+
+				if(ff && x==0)
+				{
+					//Found function
+					function = command.Substring(p0, i - p0 + 1);
+
+					//Parse args
+					var p1 = command.IndexOf(",", i);
+					if(p1>0)
+					{
+						var s = command.Substring(p1 + 1);
+						var fakeJSONArray = "[" + s + "]";
+						var arr = DocumentExtensions.ParseArray(fakeJSONArray);
+						args = arr;
+					}
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		private int GetIntboolFromDoubleOrBool(object args)
@@ -136,9 +201,21 @@ namespace MongdioLogic
 
 		private string ParseCollectionAndOperation(string command, out string name, out string operation)
 		{
+			string content = null;
+
+			var lccmd = command.ToLower();
+			if(lccmd.StartsWith("db.eval(") || lccmd.StartsWith("eval("))
+			{
+				name = null;
+				operation = "eval";
+				var p0 = command.IndexOf("eval(");
+				var p1 = command.LastIndexOf(")");
+				content = command.Substring(p0 + 5, p1 - p0 - 5);
+				return content;
+			}
+
 			var re = new Regex(@"\s*(db\.)?([^\.]+)\.([^\(]+)\(");
 			var m = re.Match(command);
-			string content = null;
 			if(m.Success)
 			{
 				name = m.Groups[2].Value;
@@ -157,5 +234,29 @@ namespace MongdioLogic
 		{
 			return null;
 		}
+
+		public bool TryParseTextAsDocument(string text)
+		{
+			var dp = new DocumentParser();
+			var d = dp.Parse(text) as Document;
+			return d != null;
+		}
+
+		public string SaveObject(string text)
+		{
+			var dp = new DocumentParser();
+			var d = dp.Parse(text) as Document;
+			if(d == null)
+				return "No object";
+			if(_lastCollectionUsed == null)
+				return "No collection";
+
+			using(var db = MDB.GetMongo())
+			{
+				UpdateObjectAlwaysUpsert(_lastCollectionUsed,d,db);
+				return string.Format("Object saved in collection '{0}'", _lastCollectionUsed);
+			}
+		}
+
 	}
 }

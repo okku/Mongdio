@@ -21,6 +21,9 @@ namespace Mongdio
 			InitializeComponent();
 			KeyDown += MongoEditorControl_KeyDown;
 			rtEditor.KeyDown += MongoEditorControl_KeyDown;
+			rtResult.KeyDown += MongoEditorControl_KeyDown;
+			rtEditor.SelectionTabs = (new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }).Select(x => x * 32).ToArray();
+			rtResult.SelectionTabs = (new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }).Select(x => x * 32).ToArray();
 
 			_session = new MongoEditorSession(name);
 		}
@@ -29,15 +32,30 @@ namespace Mongdio
 		{
 			if(e.KeyCode == Keys.F5)
 			{
-				//MessageBox.Show(this, rtEditor.SelectedText);
-				string command;
-				if(rtEditor.SelectedText.Length > 0)
-					command = rtEditor.SelectedText;
-				else
-					command = rtEditor.Text;
-
-				RunCommand(command);
+				RunCommand();
 			}
+			else if(toolStripButtonSave.Enabled && e.KeyCode == Keys.F6)
+			{
+				SaveObject();
+			}
+		}
+
+		private void SaveObject()
+		{
+			var s = rtResult.SelectedText;
+			var ret = _session.SaveObject(s);
+			toolStripCommandLabel.Text = ret;
+		}
+
+		private void RunCommand()
+		{
+			string command;
+			if(rtEditor.SelectedText.Length > 0)
+				command = rtEditor.SelectedText;
+			else
+				command = rtEditor.Text;
+
+			RunCommand(command);
 		}
 
 		private void RunCommand(string command)
@@ -57,5 +75,22 @@ namespace Mongdio
 			}
 			toolStripCommandLabel.Text = string.Format("{0} objects", objectCount);
 		}
+
+		private void toolStripButtonRun_Click(object sender, EventArgs e)
+		{
+			RunCommand();
+		}
+
+		private void toolStripButtonSave_Click(object sender, EventArgs e)
+		{
+			SaveObject();
+		}
+
+		private void rtResult_SelectionChanged(object sender, EventArgs e)
+		{
+			var s = rtResult.SelectedText;
+			toolStripButtonSave.Enabled = _session.TryParseTextAsDocument(s);
+		}
+
 	}
 }

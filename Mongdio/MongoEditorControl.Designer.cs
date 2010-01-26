@@ -32,11 +32,12 @@
 			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
 			this.toolStripCommandLabel = new System.Windows.Forms.ToolStripStatusLabel();
 			this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-			this.toolStripComboBox1 = new System.Windows.Forms.ToolStripComboBox();
 			this.toolStripColoring = new System.Windows.Forms.ToolStripButton();
 			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
 			this.rtEditor = new System.Windows.Forms.RichTextBox();
 			this.rtResult = new System.Windows.Forms.RichTextBox();
+			this.toolStripButtonRun = new System.Windows.Forms.ToolStripButton();
+			this.toolStripButtonSave = new System.Windows.Forms.ToolStripButton();
 			this.statusStrip1.SuspendLayout();
 			this.toolStrip1.SuspendLayout();
 			this.splitContainer1.Panel1.SuspendLayout();
@@ -63,18 +64,14 @@
 			// toolStrip1
 			// 
 			this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripComboBox1,
-            this.toolStripColoring});
+            this.toolStripColoring,
+            this.toolStripButtonRun,
+            this.toolStripButtonSave});
 			this.toolStrip1.Location = new System.Drawing.Point(0, 0);
 			this.toolStrip1.Name = "toolStrip1";
 			this.toolStrip1.Size = new System.Drawing.Size(583, 25);
 			this.toolStrip1.TabIndex = 4;
 			this.toolStrip1.Text = "toolStrip1";
-			// 
-			// toolStripComboBox1
-			// 
-			this.toolStripComboBox1.Name = "toolStripComboBox1";
-			this.toolStripComboBox1.Size = new System.Drawing.Size(121, 25);
 			// 
 			// toolStripColoring
 			// 
@@ -107,6 +104,7 @@
 			// 
 			// rtEditor
 			// 
+			this.rtEditor.AcceptsTab = true;
 			this.rtEditor.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.rtEditor.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.rtEditor.Location = new System.Drawing.Point(0, 0);
@@ -117,6 +115,7 @@
 			// 
 			// rtResult
 			// 
+			this.rtResult.AcceptsTab = true;
 			this.rtResult.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.rtResult.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.rtResult.Location = new System.Drawing.Point(0, 0);
@@ -124,6 +123,28 @@
 			this.rtResult.Size = new System.Drawing.Size(583, 233);
 			this.rtResult.TabIndex = 0;
 			this.rtResult.Text = "";
+			this.rtResult.SelectionChanged += new System.EventHandler(this.rtResult_SelectionChanged);
+			// 
+			// toolStripButtonRun
+			// 
+			this.toolStripButtonRun.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.toolStripButtonRun.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonRun.Image")));
+			this.toolStripButtonRun.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.toolStripButtonRun.Name = "toolStripButtonRun";
+			this.toolStripButtonRun.Size = new System.Drawing.Size(73, 22);
+			this.toolStripButtonRun.Text = "Execute (F5)";
+			this.toolStripButtonRun.Click += new System.EventHandler(this.toolStripButtonRun_Click);
+			// 
+			// toolStripButtonSave
+			// 
+			this.toolStripButtonSave.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.toolStripButtonSave.Enabled = false;
+			this.toolStripButtonSave.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonSave.Image")));
+			this.toolStripButtonSave.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.toolStripButtonSave.Name = "toolStripButtonSave";
+			this.toolStripButtonSave.Size = new System.Drawing.Size(91, 22);
+			this.toolStripButtonSave.Text = "Save object (F6)";
+			this.toolStripButtonSave.Click += new System.EventHandler(this.toolStripButtonSave_Click);
 			// 
 			// MongoEditorControl
 			// 
@@ -151,10 +172,11 @@
 		private System.Windows.Forms.StatusStrip statusStrip1;
 		private System.Windows.Forms.ToolStripStatusLabel toolStripCommandLabel;
 		private System.Windows.Forms.ToolStrip toolStrip1;
-		private System.Windows.Forms.ToolStripComboBox toolStripComboBox1;
 		private System.Windows.Forms.SplitContainer splitContainer1;
 		private System.Windows.Forms.RichTextBox rtEditor;
 		private System.Windows.Forms.RichTextBox rtResult;
 		private System.Windows.Forms.ToolStripButton toolStripColoring;
+		private System.Windows.Forms.ToolStripButton toolStripButtonRun;
+		private System.Windows.Forms.ToolStripButton toolStripButtonSave;
 	}
 }

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MongoDB.Driver;
-using Procurios.Public;
 
 namespace MongdioLogic.db
 {
@@ -137,13 +136,6 @@ namespace MongdioLogic.db
 			var d = new Document().Append("$eval", function);
 			if(args.Count()>0)
 			{
-				//var argsd = args.Select(x=>new Document())
-
-//				for(int i = 0; i < args.Count(); i++)
-//				{
-//					var o = args[i];
-//
-//				}
 				d.Append("args", args);
 			}
 			return d;
@@ -151,22 +143,22 @@ namespace MongdioLogic.db
 
 		public static List<object> ParseArray(string array)
 		{
-			var arr = JSON.JsonDecode(array);
-			if(arr==null && arr is ArrayList)
-				throw new ArgumentException("Unparsable arguments: " + array);
-			var list = new List<object>();
-			return (arr as ArrayList).OfType<object>().Select(x=>ConvertTo(x)).ToList();
+			var dp = new DocumentParser();
+			var arr = dp.Parse(array) as List<object>;
+			if(array.Trim().Length > 0 && arr == null)
+				throw new Exception("Array unparsable '" + array + "'");
+			return arr;
 		}
 
 		public static Document Parse(string text)
 		{
-			var decoded = JSON.JsonDecode(text);
-			if(text.Trim().Length > 0 && decoded == null)
+			var dp = new DocumentParser();
+			var doc = dp.Parse(text) as Document;
+			if(text.Trim().Length > 0 && doc == null)
 				throw new Exception("Document unparsable '" + text + "'");
-			var bson = ConvertTo(decoded);
-			return bson as Document;
+			return doc;
 		}
-
+/*
 		private static object ConvertTo(object v)
 		{
 			if(v is ArrayList)
@@ -189,6 +181,12 @@ namespace MongdioLogic.db
 				}
 				return d;
 			}
+			else if(v is JSON.OID)
+			{
+				var oid = v as JSON.OID;
+				var d = new Oid(oid.StringValue);
+				return d;
+			}
 			else if(v is string)
 			{
 				string s = v.ToString();
@@ -207,6 +205,6 @@ namespace MongdioLogic.db
 			else
 				return v;
 		}
-
+*/
 	}
 }

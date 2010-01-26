@@ -52,10 +52,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="db\DocumentExtensions.cs" />
+    <Compile Include="db\DocumentParser.cs" />
     <Compile Include="db\MDB.cs" />
     <Compile Include="db\Mong.cs" />
     <Compile Include="db\PrettyPrint.cs" />
-    <Compile Include="json\JSON.cs" />
     <Compile Include="MongoEditorSession.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="test\TestParse.cs" />
