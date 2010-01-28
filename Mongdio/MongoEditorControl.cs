@@ -60,11 +60,63 @@ namespace Mongdio
 
 		private void RunCommand(string command)
 		{
+			var bgw = new BackgroundWorker();
+			bgw.DoWork += bgw_DoWork;
+			bgw.ProgressChanged += bgw_ProgressChanged;
+			bgw.RunWorkerCompleted += bgw_RunWorkerCompleted;
+			bgw.WorkerReportsProgress = true;
+			bgw.WorkerSupportsCancellation = true;
+			bgw.RunWorkerAsync(command);
+		}
+
+		void bgw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+		{
+			throw new NotImplementedException();
+		}
+
+		void bgw_ProgressChanged(object sender, ProgressChangedEventArgs e)
+		{
+			e.ProgressPercentage
+
+			toolStripCommandLabel.Text = string.Format("{0} objects", objectCount);
+		}
+
+		void bgw_DoWork(object sender, DoWorkEventArgs e)
+		{
+			var bgw = sender as BackgroundWorker;
+			var command = e.Argument as string;
+
+			int setSize = 10;
+			int offset = 0;
+			rtResult.Clear();
+			while(true)
+			{
+				int objectCount;
+				if(!toolStripColoring.Checked)
+				{
+					var printer = new PrettyPrint();
+					var result = _session.Execute(command, out objectCount, printer, setSize, offset);
+					//rtResult.AppendText(result);
+					bgw.ReportProgress();
+				}
+				else
+				{
+					var printer = new RTFPrettyPrinter();
+					var rtfResult = _session.Execute(command, out objectCount, printer, setSize, offset);
+					//RTFHelper.SetRTF(rtResult, rtfResult, RTFHelper.COLOR_TABLE);
+				}
+
+				offset += setSize;
+			}
+		}
+/*
+		private void RunCommand(string command)
+		{
 			int objectCount;
 			if(!toolStripColoring.Checked)
 			{
 				var printer = new PrettyPrint();
-				var result = _session.Execute(command,out objectCount,printer);
+				var result = _session.Execute(command, out objectCount, printer);
 				rtResult.Text = result;
 			}
 			else
@@ -75,6 +127,7 @@ namespace Mongdio
 			}
 			toolStripCommandLabel.Text = string.Format("{0} objects", objectCount);
 		}
+*/
 
 		private void toolStripButtonRun_Click(object sender, EventArgs e)
 		{

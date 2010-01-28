@@ -19,7 +19,7 @@ namespace MongdioLogic
 			DataBaseName = dbname;
 		}
 
-		public string Execute(string command, out int objectCount, IDocumentPrettyPrint printer)
+		public string Execute(string command, out int objectCount, IDocumentPrettyPrint printer, int take, int skip)
 		{
 			objectCount = 0; 
 			try
@@ -34,7 +34,7 @@ namespace MongdioLogic
 						doc = DocumentExtensions.Parse(innerCommand);
 						using(var db = MDB.GetMongo())
 						{
-							var l = db[DataBaseName][collectionName].Find(doc);
+							var l = db[DataBaseName][collectionName].Find(doc, take, skip);
 							objectCount = l.Documents.Count();
 							_lastCollectionUsed = collectionName;
 							return printer.Print(l.Documents);
