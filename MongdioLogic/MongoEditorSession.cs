@@ -135,8 +135,6 @@ namespace MongdioLogic
             }   
 			else
 				db[DataBaseName][collectionName].Update(doc);
-
-			db[DataBaseName][collectionName].Update(doc);
 		}
 
 		private bool SplitIntoFunctionAndArguments(string command, out string function, out List<object> args)

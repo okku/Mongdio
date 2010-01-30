@@ -60,5 +60,48 @@ namespace MongdioLogic.db
 				return null;
 			}
 		}
+
+		public static bool DropCollection(string dbName,string collectionName)
+		{
+			using(var db = GetMongo())
+			{
+				var cmd = new Document().Append("drop", collectionName);
+				var d = db[dbName].SendCommand(cmd);
+				if(d != null)
+					return (double) d["ok"]==1;
+				return false;
+			}
+		}
+
+		public static bool DropDatabase(string dbName)
+		{
+			using(var db = GetMongo())
+			{
+				var cmd = new Document().Append("dropDatabase", 1);
+				var d = db[dbName].SendCommand(cmd);
+				if(d != null)
+					return (double)d["ok"] == 1;
+				return false;
+			}
+		}
+
+		public static void CreateCollection(string dbName, string collectionName)
+		{
+			using(var db = GetMongo())
+			{
+				db[dbName][collectionName].Update(new Document().Append("key", 1));
+				db[dbName][collectionName].Delete(new Document().Append("key", 1));
+			}
+		}
+
+		public static bool CreateDatabase(string dbName)
+		{
+			using(var db = GetMongo())
+			{
+				db[dbName]["_dummy"].Update(new Document().Append("key", 1));
+			}
+			DropCollection(dbName, "_dummy");
+			return true;
+		}
 	}
 }
