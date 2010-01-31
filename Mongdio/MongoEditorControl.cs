@@ -28,6 +28,11 @@ namespace Mongdio
 			_session = new MongoEditorSession(name);
 		}
 
+		public string DbName
+		{
+			get { return _session.DataBaseName; }
+		}
+
 		void MongoEditorControl_KeyDown(object sender, KeyEventArgs e)
 		{
 			if(e.KeyCode == Keys.F5)
@@ -92,5 +97,20 @@ namespace Mongdio
 			toolStripButtonSave.Enabled = _session.TryParseTextAsDocument(s);
 		}
 
+		public void AddText(string text)
+		{
+			if(rtEditor.Text.Trim().Length>0)
+			{
+				if(!rtEditor.Text.EndsWith(Environment.NewLine))
+					rtEditor.AppendText(Environment.NewLine);
+
+				rtEditor.AppendText(Environment.NewLine);
+			}
+			var ss = rtEditor.Text.Length;
+			rtEditor.AppendText(text);
+			rtEditor.SelectionStart = ss;
+			rtEditor.ScrollToCaret();
+			rtEditor.Focus();
+		}
 	}
 }

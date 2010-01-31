@@ -25,8 +25,9 @@ namespace MongdioLogic
 			try
 			{
 				_lastCollectionUsed = null;
+				int take;
 				string collectionName, operation;
-				string innerCommand = ParseCollectionAndOperation(command, out collectionName, out operation);
+				string innerCommand = ParseCollectionAndOperation(command, out collectionName, out operation, out take);
 				Document doc;
 				switch(operation)
 				{
@@ -34,7 +35,7 @@ namespace MongdioLogic
 						doc = DocumentExtensions.Parse(innerCommand);
 						using(var db = MDB.GetMongo())
 						{
-							var l = db[DataBaseName][collectionName].Find(doc);
+							var l = db[DataBaseName][collectionName].Find(doc, take, 0);
 							objectCount = l.Documents.Count();
 							_lastCollectionUsed = collectionName;
 							return printer.Print(l.Documents);
@@ -197,9 +198,10 @@ namespace MongdioLogic
 			return arr;
 		}
 
-		private string ParseCollectionAndOperation(string command, out string name, out string operation)
+		private string ParseCollectionAndOperation(string command, out string name, out string operation, out int take)
 		{
 			string content = null;
+			take = 0;
 
 			var lccmd = command.ToLower();
 			if(lccmd.StartsWith("db.eval(") || lccmd.StartsWith("eval("))
@@ -210,6 +212,14 @@ namespace MongdioLogic
 				var p1 = command.LastIndexOf(")");
 				content = command.Substring(p0 + 5, p1 - p0 - 5);
 				return content;
+			}
+
+			var reLimit = new Regex(@"limit\((\d+)\)",RegexOptions.IgnoreCase);
+			var lm = reLimit.Match(command);
+			if(lm.Success)
+			{
+				take = int.Parse(lm.Groups[1].Value);
+				command = reLimit.Replace(command,"");
 			}
 
 			var re = new Regex(@"\s*(db\.)?([^\.]+)\.([^\(]+)\(");

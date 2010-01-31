@@ -126,6 +126,7 @@ C# driver by Sam Corder
 Working commands examples
 -------------------------
 col.find()
+col.find().limit(10)
 col.findOne({name:"Okku"})
 eval(function(x) { return x.foo; }, {foo:"hello world!"})
 col.count({_id:{$gt:20}})
