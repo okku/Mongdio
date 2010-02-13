@@ -99,6 +99,13 @@ namespace MongdioLogic.db
 			return new List<T>();
 		}
 
+		public static string ToLine(this Document doc)
+		{
+			var kvs = doc.Keys.OfType<string>()
+				.Select(x => x + "_" + doc[x])
+				.ToArray();
+			return string.Join("_", kvs);
+		}
 		/*
 		public static IEnumerable<T> GetValues<T>(this Document doc, string key)
 		{

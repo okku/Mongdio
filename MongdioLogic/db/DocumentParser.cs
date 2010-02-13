@@ -36,7 +36,7 @@ namespace MongdioLogic.db
 		/// Parses the string json into a value
 		/// </summary>
 		/// <param name="json">A JSON string.</param>
-		/// <returns>An List<object>, a Document, Oid, a double, a string, null, true, or false</returns>
+		/// <returns>An List<object>, a Document, Oid, a double, an int, a string, null, true, or false</returns>
 		public object Parse(string json)
 		{
 			try
@@ -219,8 +219,7 @@ namespace MongdioLogic.db
 				case TOKEN_STRING:
 					return ParseStringOrDate(json, ref index);
 				case TOKEN_NUMBER:
-					var d = ParseNumber(json, ref index);
-					return d.HasValue ? (object) d.Value : null;
+					return ParseNumber(json, ref index);
 				case TOKEN_CURLY_OPEN:
 					return ParseObject(json, ref index);
 				case TOKEN_SQUARED_OPEN:
@@ -413,7 +412,7 @@ namespace MongdioLogic.db
 			return s;
 		}
 
-		protected double? ParseNumber(char[] json, ref int index)
+		protected object ParseNumber(char[] json, ref int index)
 		{
 			EatWhitespace(json, ref index);
 
@@ -423,12 +422,21 @@ namespace MongdioLogic.db
 
 			Array.Copy(json, index, numberCharArray, 0, charLength);
 			index = lastIndex + 1;
-			double d;
-			if(double.TryParse(new string(numberCharArray), NumberStyles.Any, CultureInfo.InvariantCulture, out d))
-				return d;
+			var numAsString = new string(numberCharArray);
+			if(numAsString.Contains("."))
+			{
+				double d;
+				if(double.TryParse(numAsString, NumberStyles.Any, CultureInfo.InvariantCulture, out d))
+					return d;
+			}
+			else
+			{
+				int i;
+				if(Int32.TryParse(numAsString, NumberStyles.Any, CultureInfo.InvariantCulture, out i))
+					return i;
+			}
 
 			return null;
-			//return Double.Parse(new string(numberCharArray), CultureInfo.InvariantCulture);
 		}
 
 		protected int GetLastIndexOfNumber(char[] json, int index)

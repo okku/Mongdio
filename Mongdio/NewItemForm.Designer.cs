@@ -28,6 +28,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NewItemForm));
 			this.lblText = new System.Windows.Forms.Label();
 			this.tbValue = new System.Windows.Forms.TextBox();
 			this.btnCancel = new System.Windows.Forms.Button();
@@ -80,6 +81,7 @@
 			this.Controls.Add(this.btnCancel);
 			this.Controls.Add(this.tbValue);
 			this.Controls.Add(this.lblText);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "NewItemForm";
 			this.Text = "NewItemForm";
 			this.ResumeLayout(false);

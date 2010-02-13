@@ -61,7 +61,15 @@ namespace Mongdio
 				var dbNode = new DbNode(dbName, ctxMenuStripDb);
 				root.Nodes.Add(dbNode);
 				var collections = MDB.GetCollections(dbName);
-				dbNode.Nodes.AddRange(collections.Where(x=>x["name"].ToString().Count(y=>y=='.')<2).Select(x => new CollectionNode(x["name"].ToString(),ctxMenuStripCol)).ToArray());
+				dbNode.Nodes.AddRange(collections.Where(x=>!x["name"].ToString().Contains("$"))
+					.Select(x => new CollectionNode( x["name"].ToString(), ctxMenuStripCol )).ToArray());
+
+				foreach(CollectionNode node in dbNode.Nodes)
+				{
+					//var indexNodes = collections.Where(x => x["name"].ToString().Contains("$") && x["name"].ToString().StartsWith(node.CollectionNamespace));
+					//node.Nodes.AddRange( indexNodes.Select(x => new IndexNode(x["name"].ToString(),ctxMenuStripIndex)).ToArray() );
+					node.Nodes.AddRange(MDB.GetIndexsByNS(dbName, node.CollectionNamespace).Select(x => new IndexNode(x, ctxMenuStripIndex)).ToArray());
+				}
 			}
 
 			treeViewMenu.BeginUpdate();
@@ -208,6 +216,39 @@ namespace Mongdio
 			var colNode = treeViewMenu.SelectedNode as CollectionNode;
 			var dbNode = colNode.Parent as DbNode;
 			AddTextToQueryForm(string.Format("{0}.find().limit(50)", colNode.CollectionName), dbNode.DbName);
+		}
+
+		private void createIndexToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			//db.system.indexes.insert({ name: "name", ns: "namespaceToIndex", key: <keypattern> });
+			var node = treeViewMenu.SelectedNode as CollectionNode;
+			var nif = new NewItemForm("Create new index", "Enter index key pattern (examples: '{tag:1}' '{name:1,tag:1}' '{tags.tag:1}'");
+			if(nif.ShowDialog() == DialogResult.OK)
+			{
+				try
+				{
+					var d = MDB.CreateIndexes(node.DbNode.DbName, node.CollectionNamespace, nif.EnteredValue);
+					node.Nodes.Add(new IndexNode(d, ctxMenuStripIndex));
+				}
+				catch(ArgumentException aex)
+				{
+					MessageBox.Show(aex.Message, "Error");
+				}
+			}
+		}
+
+		private void dropIndexToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			var node = treeViewMenu.SelectedNode;
+			var indexNode = node as IndexNode;
+			var d = MessageBox.Show(string.Format("Are you sure you want to drop index '{0}'", indexNode.NiceIndexName),
+									"Drop index", MessageBoxButtons.YesNo) == DialogResult.Yes;
+			if(d)
+			{
+				var colNode = node.Parent as CollectionNode;
+				MDB.DropIndex(colNode.DbNode.DbName, colNode.CollectionName, indexNode.Key);
+				indexNode.Remove();
+			}
 		}
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using MongoDB.Driver;
@@ -90,11 +91,16 @@ namespace MongdioLogic.db
 			else if(value is Oid ||
 			  value is int ||
 			  value is Int32 ||
-			  value is long ||
-			  value is float ||
-			  value is double)
+			  value is long)
 			{
 				json.Append(value);
+			}
+			else if( value is float || value is double)
+			{
+				var s = string.Format(CultureInfo.InvariantCulture, "{0}", value);
+				if(!s.Contains("."))
+					s += ".0";
+				json.Append(s);
 			}
 			else if(value is DateTime)
 			{
@@ -191,11 +197,16 @@ namespace MongdioLogic.db
 			else if(value is Oid ||
 			  value is int ||
 			  value is Int32 ||
-			  value is long ||
-			  value is float ||
-			  value is double)
+			  value is long)
 			{
 				json.AppendFormat(@"\cf3 {0}", value);
+			}
+			else if(value is float || value is double)
+			{
+				var s = string.Format(CultureInfo.InvariantCulture, "{0}", value);
+				if(!s.Contains("."))
+					s += ".0";
+				json.AppendFormat(@"\cf3 {0}", s);
 			}
 			else if(value is DateTime)
 			{

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using MongoDB.Driver;
 
 namespace Mongdio.code
 {
@@ -13,6 +14,8 @@ namespace Mongdio.code
 			: base(text)
 		{
 			ContextMenuStrip = cms;
+			ImageIndex = 1;
+			SelectedImageIndex = 1;
 		}
 	}
 
@@ -22,6 +25,8 @@ namespace Mongdio.code
 			: base(text)
 		{
 			ContextMenuStrip = cms;
+			ImageIndex = 0;
+			SelectedImageIndex = 0;
 		}
 
 		public string DbName
@@ -36,6 +41,16 @@ namespace Mongdio.code
 			: base(text)
 		{
 			ContextMenuStrip = cms;
+			ImageIndex = 2;
+			SelectedImageIndex = 2;
+		}
+
+		public string CollectionNamespace
+		{
+			get
+			{
+				return Text;
+			}
 		}
 
 		public string CollectionName
@@ -48,6 +63,42 @@ namespace Mongdio.code
 
 				return Text;
 			}
+		}
+
+		public DbNode DbNode
+		{
+			get { return (DbNode) Parent; }
+		}
+	}
+
+	class IndexNode : TreeNode
+	{
+		private Document _doc;
+
+		public IndexNode(Document document, ContextMenuStrip cms)
+		{
+			ContextMenuStrip = cms;
+			ImageIndex = 3;
+			SelectedImageIndex = 3;
+
+			_doc = document;
+			var keys = (Document) _doc["key"];
+			Text = String.Join(",", keys.Keys.OfType<string>().ToArray());
+		}
+
+		public string NiceIndexName
+		{
+			get { return Text; }
+		}
+
+		public string IndexName
+		{
+			get { return _doc["name"].ToString(); }
+		}
+
+		public Document Key
+		{
+			get { return (Document) _doc["key"]; }
 		}
 	}
 

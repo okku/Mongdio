@@ -103,5 +103,44 @@ namespace MongdioLogic.db
 			DropCollection(dbName, "_dummy");
 			return true;
 		}
+
+		public static List<Document> GetIndexsByNS(string dbName,string collectionNamespace)
+		{
+			using(var db = GetMongo())
+			{
+				var cmd = new Document().Append("ns", collectionNamespace);
+				return db[dbName]["system.indexes"].Find(cmd).Documents.ToList();
+			}
+		}
+
+		public static Document CreateIndexes(string dbName, string collectionNamespace, string pattern)
+		{
+			using(var db = GetMongo())
+			{
+				var dp = new DocumentParser();
+				var d = dp.Parse(pattern) as Document;
+				if(d == null)
+					throw new ArgumentException("Illegal pattern");
+
+				var name = d.ToLine();
+				var cmd = new Document().Append("name",name).Append("ns", collectionNamespace).Append("key",d);
+				db[dbName]["system.indexes"].Insert(cmd);
+
+				cmd = new Document().Append("name", name);
+				return db[dbName]["system.indexes"].FindOne(cmd);
+			}
+		}
+
+		public static void DropIndex(string dbName, string collectionName, Document key)
+		{
+			using(var db = GetMongo())
+			{
+				//var cmd = new Document().Append("name", name).Append("ns", collectionNamespace);
+				//db[dbName]["system.indexes"].Delete(cmd);
+				var cmd = new Document().Append("deleteIndexes", collectionName).Append("index", key);
+				db[dbName].SendCommand(cmd);
+			}
+		}
+
 	}
 }
