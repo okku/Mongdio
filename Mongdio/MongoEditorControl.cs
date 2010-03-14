@@ -43,6 +43,10 @@ namespace Mongdio
 			{
 				SaveObject();
 			}
+			else if(toolStripButtonDelete.Enabled && e.KeyCode == Keys.F12)
+			{
+				DeleteObject();
+			}
 		}
 
 		private void SaveObject()
@@ -50,6 +54,17 @@ namespace Mongdio
 			var s = rtResult.SelectedText;
 			var ret = _session.SaveObject(s);
 			toolStripCommandLabel.Text = ret;
+		}
+
+		private void DeleteObject()
+		{
+			if(MessageBox.Show("Delete object?","Delete",MessageBoxButtons.YesNo)==DialogResult.Yes)
+			{
+				var s = rtResult.SelectedText;
+				var ret = _session.DeleteObject(s);
+				toolStripCommandLabel.Text = ret;
+				rtResult.SelectedText = "";
+			}
 		}
 
 		private void RunCommand()
@@ -91,10 +106,17 @@ namespace Mongdio
 			SaveObject();
 		}
 
+		private void toolStripButtonDelete_Click(object sender, EventArgs e)
+		{
+			DeleteObject();
+		}
+
 		private void rtResult_SelectionChanged(object sender, EventArgs e)
 		{
 			var s = rtResult.SelectedText;
-			toolStripButtonSave.Enabled = _session.TryParseTextAsDocument(s);
+			bool containsId;
+			toolStripButtonSave.Enabled = _session.TryParseTextAsDocument(s,out containsId);
+			toolStripButtonDelete.Enabled = containsId;
 		}
 
 		public void AddText(string text)
@@ -112,5 +134,6 @@ namespace Mongdio
 			rtEditor.ScrollToCaret();
 			rtEditor.Focus();
 		}
+
 	}
 }

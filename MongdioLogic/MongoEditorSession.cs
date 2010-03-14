@@ -114,6 +114,15 @@ namespace MongdioLogic
 							return "Count " + count;
 						}
 						break;
+					case "delete":
+						doc = DocumentExtensions.Parse(innerCommand);
+						using(var db = MDB.GetMongo())
+						{
+							if(doc != null)
+								db[DataBaseName][collectionName].Delete(doc);
+							return "Sent delete command";
+						}
+						break;
 					default:
 						return "Unknown operation '" + operation + "'";
 						break;
@@ -256,10 +265,13 @@ namespace MongdioLogic
 			return null;
 		}
 
-		public bool TryParseTextAsDocument(string text)
+		public bool TryParseTextAsDocument(string text, out bool containsId)
 		{
+			containsId = false;
 			var dp = new DocumentParser();
 			var d = dp.Parse(text) as Document;
+			if(d != null)
+				containsId = d.Contains("_id");
 			return d != null;
 		}
 
@@ -276,6 +288,28 @@ namespace MongdioLogic
 			{
 				UpdateObjectAlwaysUpsert(_lastCollectionUsed,d,db);
 				return string.Format("Object saved in collection '{0}'", _lastCollectionUsed);
+			}
+		}
+
+		public string DeleteObject(string text)
+		{
+			var dp = new DocumentParser();
+			var d = dp.Parse(text) as Document;
+			if(d == null)
+				return "No object";
+			if(_lastCollectionUsed == null)
+				return "No collection";
+
+			using(var db = MDB.GetMongo())
+			{
+				if(d.Contains("_id") && d["_id"] != null)
+				{
+					var selector = new Document();
+					selector["_id"] = d["_id"];
+					db[DataBaseName][_lastCollectionUsed].Delete(selector);
+					return string.Format("Object with _id: {1} deleted in collection '{0}'", _lastCollectionUsed, d["_id"]);
+				}   				
+				return string.Format("Object contains no id");
 			}
 		}
 

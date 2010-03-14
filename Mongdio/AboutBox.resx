@@ -133,11 +133,14 @@ eval(function(x) { return x.foo; }, {foo:"hello world!"})
 col.count({_id:{$gt:20}})
 col.update({_id:1,name:"mongo"})
   Update syntax: col.update(doc) or col.update(sel,doc,[upsert[,multi]])
-  Example update all: col.update({x:99},0,1)
+  Example update all: col.update({x:99},{$set:{x:100}},0,1)
+col.delete({_id:12})
 
 * Select text and run only selected part by pressing F5
 
-* Update objects easy by editing the object in the result pane, select object and press F6 to save</value>
+* Update objects easy by editing the object in the result pane, select object and press F6 to save
+
+* Delete object by selecting object and press F12</value>
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">

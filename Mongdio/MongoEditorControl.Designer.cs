@@ -33,11 +33,12 @@
 			this.toolStripCommandLabel = new System.Windows.Forms.ToolStripStatusLabel();
 			this.toolStrip1 = new System.Windows.Forms.ToolStrip();
 			this.toolStripColoring = new System.Windows.Forms.ToolStripButton();
+			this.toolStripButtonRun = new System.Windows.Forms.ToolStripButton();
+			this.toolStripButtonSave = new System.Windows.Forms.ToolStripButton();
 			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
 			this.rtEditor = new System.Windows.Forms.RichTextBox();
 			this.rtResult = new System.Windows.Forms.RichTextBox();
-			this.toolStripButtonRun = new System.Windows.Forms.ToolStripButton();
-			this.toolStripButtonSave = new System.Windows.Forms.ToolStripButton();
+			this.toolStripButtonDelete = new System.Windows.Forms.ToolStripButton();
 			this.statusStrip1.SuspendLayout();
 			this.toolStrip1.SuspendLayout();
 			this.splitContainer1.Panel1.SuspendLayout();
@@ -66,7 +67,8 @@
 			this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripColoring,
             this.toolStripButtonRun,
-            this.toolStripButtonSave});
+            this.toolStripButtonSave,
+            this.toolStripButtonDelete});
 			this.toolStrip1.Location = new System.Drawing.Point(0, 0);
 			this.toolStrip1.Name = "toolStrip1";
 			this.toolStrip1.Size = new System.Drawing.Size(583, 25);
@@ -83,6 +85,27 @@
 			this.toolStripColoring.Name = "toolStripColoring";
 			this.toolStripColoring.Size = new System.Drawing.Size(50, 22);
 			this.toolStripColoring.Text = "Coloring";
+			// 
+			// toolStripButtonRun
+			// 
+			this.toolStripButtonRun.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.toolStripButtonRun.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonRun.Image")));
+			this.toolStripButtonRun.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.toolStripButtonRun.Name = "toolStripButtonRun";
+			this.toolStripButtonRun.Size = new System.Drawing.Size(73, 22);
+			this.toolStripButtonRun.Text = "Execute (F5)";
+			this.toolStripButtonRun.Click += new System.EventHandler(this.toolStripButtonRun_Click);
+			// 
+			// toolStripButtonSave
+			// 
+			this.toolStripButtonSave.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.toolStripButtonSave.Enabled = false;
+			this.toolStripButtonSave.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonSave.Image")));
+			this.toolStripButtonSave.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.toolStripButtonSave.Name = "toolStripButtonSave";
+			this.toolStripButtonSave.Size = new System.Drawing.Size(91, 22);
+			this.toolStripButtonSave.Text = "Save object (F6)";
+			this.toolStripButtonSave.Click += new System.EventHandler(this.toolStripButtonSave_Click);
 			// 
 			// splitContainer1
 			// 
@@ -125,26 +148,16 @@
 			this.rtResult.Text = "";
 			this.rtResult.SelectionChanged += new System.EventHandler(this.rtResult_SelectionChanged);
 			// 
-			// toolStripButtonRun
+			// toolStripButtonDelete
 			// 
-			this.toolStripButtonRun.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-			this.toolStripButtonRun.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonRun.Image")));
-			this.toolStripButtonRun.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButtonRun.Name = "toolStripButtonRun";
-			this.toolStripButtonRun.Size = new System.Drawing.Size(73, 22);
-			this.toolStripButtonRun.Text = "Execute (F5)";
-			this.toolStripButtonRun.Click += new System.EventHandler(this.toolStripButtonRun_Click);
-			// 
-			// toolStripButtonSave
-			// 
-			this.toolStripButtonSave.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-			this.toolStripButtonSave.Enabled = false;
-			this.toolStripButtonSave.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonSave.Image")));
-			this.toolStripButtonSave.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButtonSave.Name = "toolStripButtonSave";
-			this.toolStripButtonSave.Size = new System.Drawing.Size(91, 22);
-			this.toolStripButtonSave.Text = "Save object (F6)";
-			this.toolStripButtonSave.Click += new System.EventHandler(this.toolStripButtonSave_Click);
+			this.toolStripButtonDelete.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.toolStripButtonDelete.Enabled = false;
+			this.toolStripButtonDelete.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonDelete.Image")));
+			this.toolStripButtonDelete.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.toolStripButtonDelete.Name = "toolStripButtonDelete";
+			this.toolStripButtonDelete.Size = new System.Drawing.Size(71, 22);
+			this.toolStripButtonDelete.Text = "Delete (F12)";
+			this.toolStripButtonDelete.Click += new System.EventHandler(this.toolStripButtonDelete_Click);
 			// 
 			// MongoEditorControl
 			// 
@@ -178,5 +191,6 @@
 		private System.Windows.Forms.ToolStripButton toolStripColoring;
 		private System.Windows.Forms.ToolStripButton toolStripButtonRun;
 		private System.Windows.Forms.ToolStripButton toolStripButtonSave;
+		private System.Windows.Forms.ToolStripButton toolStripButtonDelete;
 	}
 }
