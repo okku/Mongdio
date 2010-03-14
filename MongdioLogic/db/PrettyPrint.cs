@@ -106,9 +106,17 @@ namespace MongdioLogic.db
 			{
 				json.AppendFormat(@"""{0}""", ((DateTime)value).ToUniversalTime().ToString("o"));
 			}
+			else if(value is string)
+			{
+				json.AppendFormat(@"""{0}""", value.ToString().Replace(@"""", @"\"""));
+			}
+			else if(value is MongoDBNull)
+			{
+				json.AppendFormat(@"null");
+			}
 			else
 			{
-				json.AppendFormat(@"""{0}""", value);
+				json.AppendFormat(@"{0}", value);
 			}
 			return;
 		}
@@ -212,9 +220,17 @@ namespace MongdioLogic.db
 			{
 				json.AppendFormat(@"\cf3 ""{0}""", ((DateTime)value).ToUniversalTime().ToString("o"));
 			}
+			else if(value is string)
+			{
+				json.AppendFormat(@"\cf1 ""{0}""", value.ToString().Replace(@"\", @"\\").Replace(@"""", @"\\"""));
+			}
+			else if(value is MongoDBNull)
+			{
+				json.AppendFormat(@"\cf2 null");
+			}
 			else
 			{
-				json.AppendFormat(@"\cf1 ""{0}""", value);
+				json.AppendFormat(@"\cf1 {0}", value);
 			}
 			return;
 		}

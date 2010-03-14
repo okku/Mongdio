@@ -127,11 +127,13 @@ Working commands examples
 -------------------------
 col.find()
 col.find().limit(10)
+col.find().sort({name:1})
 col.findOne({name:"Okku"})
 eval(function(x) { return x.foo; }, {foo:"hello world!"})
 col.count({_id:{$gt:20}})
 col.update({_id:1,name:"mongo"})
   Update syntax: col.update(doc) or col.update(sel,doc,[upsert[,multi]])
+  Example update all: col.update({x:99},0,1)
 
 * Select text and run only selected part by pressing F5
 

@@ -26,16 +26,20 @@ namespace MongdioLogic
 			{
 				_lastCollectionUsed = null;
 				int take;
-				string collectionName, operation;
-				string innerCommand = ParseCollectionAndOperation(command, out collectionName, out operation, out take);
-				Document doc;
+				string collectionName, operation, sort;
+				string innerCommand = ParseCollectionAndOperation(command, out collectionName, out operation, out take, out sort);
+				Document doc,sortDoc = null;
 				switch(operation)
 				{
 					case "find":
 						doc = DocumentExtensions.Parse(innerCommand);
+						if(!string.IsNullOrEmpty(sort))
+							sortDoc = DocumentExtensions.Parse(sort);
 						using(var db = MDB.GetMongo())
 						{
 							var l = db[DataBaseName][collectionName].Find(doc, take, 0);
+							if(sortDoc != null)
+								l.Sort(sortDoc);
 							objectCount = l.Documents.Count();
 							_lastCollectionUsed = collectionName;
 							return printer.Print(l.Documents);
@@ -198,10 +202,11 @@ namespace MongdioLogic
 			return arr;
 		}
 
-		private string ParseCollectionAndOperation(string command, out string name, out string operation, out int take)
+		private string ParseCollectionAndOperation(string command, out string name, out string operation, out int take, out string sort)
 		{
 			string content = null;
 			take = 0;
+			sort = null;
 
 			var lccmd = command.ToLower();
 			if(lccmd.StartsWith("db.eval(") || lccmd.StartsWith("eval("))
@@ -220,6 +225,14 @@ namespace MongdioLogic
 			{
 				take = int.Parse(lm.Groups[1].Value);
 				command = reLimit.Replace(command,"");
+			}
+
+			var reSort = new Regex(@"sort\(([^\)]+)\)", RegexOptions.IgnoreCase);
+			var sm = reSort.Match(command);
+			if(sm.Success)
+			{
+				sort = sm.Groups[1].Value;
+				command = reSort.Replace(command, "");
 			}
 
 			var re = new Regex(@"\s*(db\.)?([^\.]+)\.([^\(]+)\(");

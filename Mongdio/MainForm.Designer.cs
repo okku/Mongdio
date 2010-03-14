@@ -362,7 +362,7 @@
 			// 
 			this.dropIndexToolStripMenuItem.Enabled = false;
 			this.dropIndexToolStripMenuItem.Name = "dropIndexToolStripMenuItem";
-			this.dropIndexToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.dropIndexToolStripMenuItem.Size = new System.Drawing.Size(139, 22);
 			this.dropIndexToolStripMenuItem.Text = "Drop Index";
 			this.dropIndexToolStripMenuItem.Click += new System.EventHandler(this.dropIndexToolStripMenuItem_Click);
 			// 
@@ -376,7 +376,7 @@
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MainMenuStrip = this.menuStrip1;
 			this.Name = "MainForm";
-			this.Text = "Mongdio v0.3";
+			this.Text = "Mongdio v0.3.1";
 			this.menuStrip1.ResumeLayout(false);
 			this.menuStrip1.PerformLayout();
 			this.splitContainer1.Panel1.ResumeLayout(false);

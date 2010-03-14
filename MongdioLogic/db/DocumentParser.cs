@@ -337,9 +337,9 @@ namespace MongdioLogic.db
 				}
 				else if(c == '\\')
 				{
-
 					if(index == json.Length)
 					{
+						s += '\\';
 						break;
 					}
 					c = json[index++];
@@ -347,6 +347,9 @@ namespace MongdioLogic.db
 					{
 						s += '"';
 					}
+					else
+						s += "\\" + c;
+/*
 					else if(c == '\\')
 					{
 						s += '\\';
@@ -395,7 +398,7 @@ namespace MongdioLogic.db
 							break;
 						}
 					}
-
+*/
 				}
 				else
 				{
